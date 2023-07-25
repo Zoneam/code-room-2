@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
+import { useState } from 'react';
+import { Route, Routes } from "react-router";
+import CreatePostPage from './pages/CreatePostPage/CreatePostPage';
+import { getUser } from '../utilities/users-service';
+import Navbar from './components/Navbar/Navbar'
+import LoginForm from './components/LoginForm/LoginForm';
+import SignUpForm from './components/SignUpForm/SignUpForm';
+import MyPostsPage from './pages/MyPostsPage/MyPostsPage'
+import AllPostsPage from './pages/AllPostsPage/AllPostsPage'
+import FullPostPage from './pages/FullPostPage/FullPostPage'
+import { useNavigate, Navigate } from "react-router-dom";
+import UserPostsPage from './pages/UserPostsPage/UserPostsPage';
+import FavoritePage from './pages/FavoritePage/FavoritePage';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(getUser());
+  const navigate = useNavigate();
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <Navbar user={user} setUser={setUser}/>
+      <Routes>
+      <Route path="/" element={user?<Navigate to="/myposts" />:<LoginForm setUser={setUser}/>}/>
+        <Route path="/login" element={user?<Navigate to="/myposts" />:<LoginForm setUser={setUser}/>}/>
+        <Route path="/signup" element={<SignUpForm setUser={setUser} navigate={navigate}/>}/>
+        <Route path="/myposts" element={user?<MyPostsPage/>:<LoginForm setUser={setUser}/>}/>
+        <Route path="/favorites" element={user?<FavoritePage user={user} />:<LoginForm setUser={setUser}/>}/>
+        <Route path="/allposts" element={user?<AllPostsPage user={user}/>:<LoginForm setUser={setUser}/>}/>
+        <Route path="/allposts/post/:id" element={user?<FullPostPage/>:<LoginForm setUser={setUser}/>}/>
+        <Route path="/create" element={user?<CreatePostPage/>:<LoginForm setUser={setUser}/>}/>
+        <Route path="/userposts/:id" element={user?<UserPostsPage user={user}/>:<LoginForm setUser={setUser}/>}/>
+      </Routes>
+    </div>
+  );
 }
 
 export default App
